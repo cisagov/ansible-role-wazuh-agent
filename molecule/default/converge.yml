@@ -5,3 +5,6 @@
     - name: Include ansible-role-wazuh-agent
       ansible.builtin.include_role:
         name: ansible-role-wazuh-agent
+      vars:
+        # Dummy value
+        wazuh_agent_manager: example.com
