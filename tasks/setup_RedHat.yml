@@ -1,8 +1,17 @@
 ---
-# Setup for installing Wazuh agent on Fedora from the official Wazuh
+# Setup for installing Wazuh agent on RedHat from the official Wazuh
 # repo.
 #
 # https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-linux.html
+
+- name: Install gnupg2 (necessary for RPM repo GPG key manipulations)
+  ansible.builtin.package:
+    name:
+      - gnupg2
+  when:
+    # AL2023 already has a package installed called gnupg2-minimal
+    # that conflicts with gnupg2.
+    - ansible_distribution != "Amazon"
 
 - name: Import Wazuh RPM GPG key
   ansible.builtin.rpm_key:
