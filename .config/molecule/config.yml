@@ -109,6 +109,6 @@ provisioner:
       # See ansible/molecule#4380 and
       # https://github.com/ansible/molecule/releases/tag/v25.2.0 for
       # more details.
-      roles_path: ~/.cache/molecule/skeleton-ansible-role/${MOLECULE_SCENARIO_NAME}/roles:${MOLECULE_PROJECT_DIRECTORY}/..:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles
+      roles_path: ~/.cache/molecule/ansible-role-wazuh-agent/${MOLECULE_SCENARIO_NAME}/roles:${MOLECULE_PROJECT_DIRECTORY}/..:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles
 verifier:
   name: testinfra
