@@ -1,4 +1,10 @@
 ---
+- name: Ensure that the required role variable was provided
+  ansible.builtin.assert:
+    that:
+      - wazuh_agent_manager is defined
+    fail_msg: The wazuh_agent_manager role variable must be defined.
+
 - name: Load tasks file based on the OS type
   ansible.builtin.include_tasks: "{{ lookup('first_found', params) }}"
   vars:
