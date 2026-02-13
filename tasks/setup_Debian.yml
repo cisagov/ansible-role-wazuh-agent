@@ -15,13 +15,23 @@
   when:
     - ansible_distribution_release == "buster"
   block:
-    - name: Get official Wazuh repo GPG key
-      ansible.builtin.apt_key:
+    - name: Ensure APT keyrings directory exists
+      ansible.builtin.file:
+        mode: u=rwx,g=rx,o=rx
+        path: /etc/apt/keyrings
+        state: directory
+
+    - name: Download official Wazuh repo GPG key
+      ansible.builtin.get_url:
         url: https://packages.wazuh.com/key/GPG-KEY-WAZUH
+        dest: /etc/apt/keyrings/wazuh.asc
+        mode: u=rw,g=r,o=r
 
     - name: Add the official Wazuh repo
       ansible.builtin.apt_repository:
-        repo: deb https://packages.wazuh.com/4.x/apt/ stable main
+        repo: >-
+          deb [signed-by=/etc/apt/keyrings/wazuh.asc]
+          https://packages.wazuh.com/4.x/apt/ stable main
     # ansible.builtin.apt_repository updates the package cache so
     # there is no need to do it explicitly.
 
