@@ -1,0 +1,65 @@
+---
+# Setup for installing Wazuh agent on Debian from the official Wazuh
+# repo
+#
+# https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-linux.html
+
+- name: Install gnupg2 (necessary for apt repo GPG key manipulations)
+  ansible.builtin.package:
+    name:
+      - gnupg2
+
+# Debian Buster does not support DEB822 repos, so we have to treat it
+# as a special case.
+- name: Add official Wazuh repo (Debian Buster)
+  when:
+    - ansible_distribution_release == "buster"
+  block:
+    - name: Ensure APT keyrings directory exists
+      ansible.builtin.file:
+        mode: u=rwx,g=rx,o=rx
+        path: /etc/apt/keyrings
+        state: directory
+
+    - name: Download official Wazuh repo GPG key
+      ansible.builtin.get_url:
+        url: https://packages.wazuh.com/key/GPG-KEY-WAZUH
+        dest: /etc/apt/keyrings/wazuh.asc
+        mode: u=rw,g=r,o=r
+
+    - name: Add the official Wazuh repo
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [signed-by=/etc/apt/keyrings/wazuh.asc]
+          https://packages.wazuh.com/4.x/apt/ stable main
+    # ansible.builtin.apt_repository updates the package cache so
+    # there is no need to do it explicitly.
+
+- name: Add official Wazuh repo (not Debian Buster)
+  when:
+    - ansible_distribution_release != "buster"
+  block:
+    - name: Install prerequisites so apt can use DEB822 repos
+      ansible.builtin.package:
+        name:
+          - python3-debian
+
+    - name: Add the official Wazuh repo
+      ansible.builtin.deb822_repository:
+        components:
+          - main
+        name: wazuh
+        signed_by: https://packages.wazuh.com/key/GPG-KEY-WAZUH
+        suites:
+          - stable
+        uris:
+          - https://packages.wazuh.com/4.x/apt/
+      notify:
+        - Update the package cache
+
+    # We need the handler that updates the apt package cache to run
+    # now if it is necessary.  It is required by the parent playbook
+    # since it will attempt to install the packages from the new apt
+    # package repo.
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
