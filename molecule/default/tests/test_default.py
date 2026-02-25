@@ -2,6 +2,7 @@
 
 # Standard Python Libraries
 import os
+import re
 
 # Third-Party Libraries
 import pytest
@@ -22,3 +23,42 @@ def test_wazuh_agent_enabled(host):
     """Test that Wazuh agent is enabled."""
     svc = host.service("wazuh-agent")
     assert svc.is_enabled, "Wazuh agent is not enabled."
+
+
+def test_dropin_dir(host):
+    """Test that the wazuh-agent drop-in directory was created as expected."""
+    f = host.file("/etc/systemd/system/wazuh-agent.service.d")
+
+    assert f.exists
+    assert f.is_directory
+    assert f.user == "root"
+    assert f.group == "root"
+    assert f.mode == 0o755
+
+
+def test_dropin_file(host):
+    """Test that the wazuh-agent drop-in file was created as expected."""
+    f = host.file("/etc/systemd/system/wazuh-agent.service.d/wazuh-agent.conf")
+
+    assert f.exists
+    assert f.is_file
+    assert f.user == "root"
+    assert f.group == "root"
+    assert f.mode == 0o644
+
+
+@pytest.mark.parametrize(
+    "prop,regex",
+    [
+        ("After", r"^After=.*cloud-init\.target"),
+        ("Requires", r"^Requires=.*cloud-init\.target"),
+    ],
+)
+def test_unit_properties(host, prop, regex):
+    """Test that unit properties were modified via drop-in as expected."""
+    cmd = f"systemctl show --no-pager --property={prop} wazuh-agent.service"
+    cmd_result = host.run(cmd)
+    assert cmd_result.rc == 0, f"{cmd} command failed"
+    assert (
+        re.search(regex, cmd_result.stdout) is not None
+    ), f"Regex {regex} does not match any line in {cmd} output."
