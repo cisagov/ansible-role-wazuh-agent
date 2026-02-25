@@ -16,6 +16,13 @@
       paths:
         - "{{ role_path }}/tasks"
 
+# XMLStarlet is used by cloud-init at startup time to inject the Wazuh
+# agent name into the Wazuh XML configuration file.  See
+# cisagov/cool-assessment-terraform for examples where this is done.
+- name: Install XMLStarlet
+  ansible.builtin.package:
+    name: xmlstarlet
+
 - name: Install the Wazuh agent
   ansible.builtin.package:
     name: wazuh-agent

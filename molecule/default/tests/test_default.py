@@ -4,6 +4,7 @@
 import os
 
 # Third-Party Libraries
+import pytest
 import testinfra.utils.ansible_runner
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
@@ -11,9 +12,10 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 ).get_hosts("all")
 
 
-def test_wazuh_agent_installed(host):
-    """Test that Wazuh agent was installed."""
-    assert host.package("wazuh-agent").is_installed, "Wazuh agent is not installed."
+@pytest.mark.parametrize("pkg", ["wazuh-agent", "xmlstarlet"])
+def test_packages_installed(host, pkg):
+    """Test that expected packages were installed."""
+    assert host.package(pkg).is_installed, f"System package {pkg} is not installed."
 
 
 def test_wazuh_agent_enabled(host):
