@@ -1,0 +1,5 @@
+[Unit]
+# The agent name isn't injected into the Wazuh agent XML configuration
+# file until cloud-final (i.e., all the cloud-init foo) has completed.
+After=cloud-init.target
+Requires=cloud-init.target
