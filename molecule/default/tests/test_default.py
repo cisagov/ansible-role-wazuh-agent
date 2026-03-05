@@ -76,5 +76,5 @@ def test_dependency(host, unit, dependent_unit):
     cmd_result = host.run(cmd)
     assert cmd_result.rc == 0, f"{cmd} command failed"
     assert (
-        "wazuh-agent.service" in cmd_result.stdout
+        dependent_unit in cmd_result.stdout
     ), f"{dependent_unit} not listed as a dependency of {unit}."
