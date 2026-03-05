@@ -1,5 +1,12 @@
 [Unit]
-# The agent name isn't injected into the Wazuh agent XML configuration
-# file until cloud-final has completed.
-After=cloud-final.service
-Wants=cloud-final.service
+# Do not start if this file already exists.  This prevents the service
+# from being started more than once if the config file changes for
+# other reasons.
+ConditionPathExists=!/var/ossec/.config_modified
+
+[Service]
+# Wait up to two minutes for cloud-init to write the agent name into
+# the config file.
+ExecStartPre=/usr/bin/bash -c 'for i in {1..60}; do grep --quiet "<agent_name>" /var/ossec/etc/ossec.conf && exit 0; sleep 2; done; exit 1'
+# Create the gate file
+ExecStartPost=/usr/bin/touch /var/ossec/.config_modified
