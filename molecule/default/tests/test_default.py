@@ -50,8 +50,8 @@ def test_dropin_file(host):
 @pytest.mark.parametrize(
     "prop,regex",
     [
-        ("After", r"^After=.*cloud-final\.service"),
-        ("Wants", r"^Wants=.*cloud-final\.service"),
+        ("After", r"^After=.*cloud-init\.target"),
+        ("Wants", r"^Wants=.*cloud-init\.target"),
     ],
 )
 def test_unit_properties(host, prop, regex):
