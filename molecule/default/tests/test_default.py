@@ -62,3 +62,19 @@ def test_unit_properties(host, prop, regex):
     assert (
         re.search(regex, cmd_result.stdout) is not None
     ), f"Regex {regex} does not match any line in {cmd} output."
+
+
+@pytest.mark.parametrize(
+    "unit,dependent_unit",
+    [
+        ("multi-user.target", "wazuh-agent.service"),
+    ],
+)
+def test_dependency(host, unit, dependent_unit):
+    """Test that dependent_unit is a dependency of unit."""
+    cmd = f"systemctl list-dependencies {unit}"
+    cmd_result = host.run(cmd)
+    assert cmd_result.rc == 0, f"{cmd} command failed"
+    assert (
+        "wazuh-agent.service" in cmd_result.stdout
+    ), f"{dependent_unit} not listed as a dependency of {unit}."
