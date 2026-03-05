@@ -19,10 +19,10 @@ def test_packages_installed(host, pkg):
     assert host.package(pkg).is_installed, f"System package {pkg} is not installed."
 
 
-def test_wazuh_agent_enabled(host):
-    """Test that Wazuh agent is enabled."""
-    svc = host.service("wazuh-agent")
-    assert svc.is_enabled, "Wazuh agent is not enabled."
+def test_wazuh_agent_path_enabled(host):
+    """Test that Wazuh agent path unit is enabled."""
+    svc = host.service("wazuh-agent.path")
+    assert svc.is_enabled, "Wazuh agent systemd path unit is not enabled."
 
 
 def test_dropin_dir(host):

@@ -29,14 +29,6 @@
   environment:
     WAZUH_MANAGER: "{{ wazuh_agent_manager }}"
 
-- name: Enable the Wazuh agent systemd service
-  ansible.builtin.systemd_service:
-    # Unless you do this, systemd can sometimes get confused when you
-    # try to start a service you just installed.
-    daemon_reload: true
-    enabled: true
-    name: wazuh-agent
-
 - name: Install wazuh-agent service drop-in
   block:
     - name: >-
@@ -64,6 +56,25 @@
         # https://github.com/ansible/ansible/issues/19243#issuecomment-266508074
         # validate: /usr/bin/systemd-analyze verify %s
 
-    - name: Systemd daemon-reload
+- name: Install and enable the Wazuh agent systemd path unit
+  block:
+    - name: Install the Wazuh agent systemd path unit
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/wazuh-agent.path
+        group: root
+        mode: u=rw,g=r,o=r
+        owner: root
+        src: wazuh-agent.path
+        # It would be great to use systemd-analyze verify here, but
+        # that won't work.  See, for instance, this GitHub issue
+        # comment:
+        # https://github.com/ansible/ansible/issues/19243#issuecomment-266508074
+        # validate: /usr/bin/systemd-analyze verify %s
+
+    - name: Enable the Wazuh agent systemd path unit
       ansible.builtin.systemd_service:
+        # Unless you do this, systemd can sometimes get confused when
+        # you try to start a service you just installed.
         daemon_reload: true
+        enabled: true
+        name: wazuh-agent.path

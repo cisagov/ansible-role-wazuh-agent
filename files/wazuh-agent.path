@@ -1,0 +1,5 @@
+[Unit]
+Description=Start Wazuh agent when updated configuration becomes available
+
+[Path]
+PathModified=/var/ossec/etc/ossec.conf
