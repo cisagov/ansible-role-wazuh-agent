@@ -7,6 +7,11 @@
 This is an Ansible role for installing the [Wazuh
 agent](https://documentation.wazuh.com/current/installation-guide/wazuh-agent/index.html).
 
+> [!NOTE]
+> We do not enable or start the service in this Ansible role.  This is
+> done by a user-data script run by cloud-init after it has injected
+> the Wazuh agent name into the Wazuh configuration file.
+
 ## Requirements ##
 
 None.
@@ -55,6 +60,8 @@ Here's how to use it in a playbook:
     - name: Include Wazuh agent
       ansible.builtin.include_role:
         name: wazuh_agent
+      vars:
+        wazuh_agent_manager: example.com
 ```
 
 ## Contributing ##
