@@ -23,6 +23,9 @@
   ansible.builtin.package:
     name: xmlstarlet
 
+# Note that we do not enable or start the service here.  This is done
+# by cloud-init after the Wazuh agent name has been injected into the
+# Wazuh configuration file.
 - name: Install the Wazuh agent
   ansible.builtin.package:
     name: wazuh-agent
@@ -34,7 +37,3 @@
     # Unless you do this, systemd can sometimes get confused when you
     # try to enable or start a service you just installed.
     daemon_reload: true
-
-# Note that we do not enable or start the service here.  This is done
-# by cloud-init after the Wazuh agent name has been injected into the
-# Wazuh configuration file.
