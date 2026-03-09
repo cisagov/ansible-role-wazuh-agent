@@ -1,5 +1,0 @@
-[Unit]
-# The agent name isn't injected into the Wazuh agent XML configuration
-# file until cloud-final has completed.
-After=cloud-final.service
-Wants=cloud-final.service

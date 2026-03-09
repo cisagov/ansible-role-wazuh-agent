@@ -23,47 +23,17 @@
   ansible.builtin.package:
     name: xmlstarlet
 
+# Note that we do not enable or start the service here.  This is done
+# by cloud-init after the Wazuh agent name has been injected into the
+# Wazuh configuration file.
 - name: Install the Wazuh agent
   ansible.builtin.package:
     name: wazuh-agent
   environment:
     WAZUH_MANAGER: "{{ wazuh_agent_manager }}"
 
-- name: Enable the Wazuh agent systemd service
+- name: Perform a systemd daemon-reload
   ansible.builtin.systemd_service:
     # Unless you do this, systemd can sometimes get confused when you
-    # try to start a service you just installed.
+    # try to enable or start a service you just installed.
     daemon_reload: true
-    enabled: true
-    name: wazuh-agent
-
-- name: Install wazuh-agent service drop-in
-  block:
-    - name: >-
-        Ensure that the directory where the wazuh-agent service
-        drop-in will live actually exists
-      ansible.builtin.file:
-        group: root
-        mode: u=rwx,g=rx,o=rx
-        owner: root
-        path: /etc/systemd/system/wazuh-agent.service.d
-        state: directory
-
-    # This drop-in contains our local overrides for the wazuh-agent
-    # systemd service.
-    - name: Create the drop-in unit file
-      ansible.builtin.copy:
-        dest: /etc/systemd/system/wazuh-agent.service.d/wazuh-agent.conf
-        group: root
-        mode: u=rw,g=r,o=r
-        owner: root
-        src: wazuh-agent.service
-        # It would be great to use systemd-analyze verify here, but
-        # that won't work.  See, for instance, this GitHub issue
-        # comment:
-        # https://github.com/ansible/ansible/issues/19243#issuecomment-266508074
-        # validate: /usr/bin/systemd-analyze verify %s
-
-    - name: Systemd daemon-reload
-      ansible.builtin.systemd_service:
-        daemon_reload: true
