@@ -19,7 +19,7 @@ None.
 ## Role Variables ##
 
 | Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
+| -------- | ----------- | ------- | -------- |
 | wazuh_agent_manager | The hostname or IP address of the Wazuh manager to which the agent should connect. | n/a | Yes |
 
 ## Dependencies ##
